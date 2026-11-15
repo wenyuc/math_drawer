@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>函数画图工具</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <p class="eyebrow">MATH PLOTTER</p>
+        <h1>函数画图工具</h1>
+        <p>输入 LaTeX 数学表达式，生成二维函数图像或三维曲面。</p>
+      </header>
+
+      <section class="workspace" aria-label="函数绘图">
+        <form id="plot-form" class="controls">
+          <label for="mode">绘图类型</label>
+          <select id="mode" name="mode">
+            <option value="curve">二维曲线：y = f(x)</option>
+            <option value="surface">三维曲面：z = f(x, y)</option>
+            <option value="implicit">三维隐式曲面：F(x, y, z) = 0</option>
+          </select>
+
+          <label for="expression">LaTeX 数学公式</label>
+          <textarea id="expression" name="expression" rows="3" maxlength="200"
+            spellcheck="false" aria-describedby="formula-help"></textarea>
+          <p id="formula-help" class="help">例如：\sin(x) 或 \frac{x^2-y^2}{5}</p>
+
+          <button id="submit-button" type="submit">绘制函数</button>
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="plot-area">
+          <div id="placeholder" class="placeholder">
+            <span aria-hidden="true">⌁</span>
+            <p>函数图像将在这里显示</p>
+          </div>
+          <img id="plot-image" alt="函数绘图结果" hidden>
+          <div class="axis-controls" role="group" aria-label="调整坐标轴缩放">
+            <button type="button" data-axis="y" data-zoom="in"
+              aria-label="放大 y 轴间距" title="放大 y 轴间距" disabled>↑</button>
+            <button type="button" data-axis="x" data-zoom="in"
+              aria-label="放大 x 轴间距" title="放大 x 轴间距" disabled>←</button>
+            <span aria-hidden="true"></span>
+            <button type="button" data-axis="x" data-zoom="out"
+              aria-label="缩小 x 轴间距" title="缩小 x 轴间距" disabled>→</button>
+            <button type="button" data-axis="y" data-zoom="out"
+              aria-label="缩小 y 轴间距" title="缩小 y 轴间距" disabled>↓</button>
+          </div>
+        </div>
+      </section>
+      <footer>公式由本地 Python 服务计算与绘制，默认坐标范围为 -5 到 5（二维曲线为 -10 到 10）。</footer>
+    </main>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </body>
+</html>

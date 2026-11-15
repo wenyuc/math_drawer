@@ -1,0 +1,29 @@
+# 函数画图工具
+
+基于 Flask、SymPy 和 Matplotlib 的本地 LaTeX 函数绘图网页，默认仅监听本机 `127.0.0.1:5003`。
+
+## 运行
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+浏览器打开 <http://127.0.0.1:5003>。
+
+## 支持的绘图模式
+
+- 二维曲线：输入 `f(x)`，例如 `\sin(x)`。
+- 三维曲面：输入 `f(x,y)`，例如 `\sin(x)+\cos(y)`。
+- 三维隐式曲面：输入 `F(x,y,z)=0`，例如 `x^2+y^2+z^2=9`。
+
+默认绘图区间为二维曲线 `x ∈ [-10,10]`，三维坐标 `[-5,5]`。图片框中的方向键可分别放大或缩小 x、y 轴间距；二维曲线的 y 轴默认随 x 范围自动缩放，手动调整 y 轴后则保留该范围。三维图只调整 x、y 轴，z 轴范围保持不变。表达式通过 LaTeX 解析，只允许所选模式中的变量和常见数学函数。
+
+运行测试（先安装测试依赖）：
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest
+```
