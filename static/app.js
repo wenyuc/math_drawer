@@ -6,6 +6,7 @@ const image = document.querySelector("#plot-image");
 const placeholder = document.querySelector("#placeholder");
 const button = document.querySelector("#submit-button");
 const axisButtons = document.querySelectorAll(".axis-controls button");
+const intervalGroups = document.querySelectorAll(".variable-interval");
 const examples = {
   curve: String.raw`\sin(x)`,
   surface: String.raw`\sin(x)+\cos(y)`,
@@ -19,7 +20,38 @@ function defaultRanges(plotMode) {
   return {
     x: [-extent, extent],
     y: plotMode === "curve" ? null : [-5, 5],
+    z: [-5, 5],
   };
+}
+
+function updateIntervalInputs() {
+  const visibleVariables = mode.value === "curve"
+    ? ["x"]
+    : mode.value === "surface"
+      ? ["x", "y"]
+      : ["x", "y", "z"];
+
+  intervalGroups.forEach((group) => {
+    const variable = group.dataset.variable;
+    group.hidden = !visibleVariables.includes(variable);
+    if (!group.hidden) {
+      document.querySelector(`#${variable}-min`).value = ranges[variable][0];
+      document.querySelector(`#${variable}-max`).value = ranges[variable][1];
+    }
+  });
+}
+
+function readInterval(variable) {
+  const lowerInput = document.querySelector(`#${variable}-min`);
+  const upperInput = document.querySelector(`#${variable}-max`);
+  const bounds = [lowerInput.valueAsNumber, upperInput.valueAsNumber];
+  if (
+    bounds.some((bound) => !Number.isFinite(bound)) ||
+    bounds[0] >= bounds[1]
+  ) {
+    throw new Error(`${variable} 区间必须是有效数字，且下限小于上限。`);
+  }
+  return bounds;
 }
 
 function rangeFromHeader(response, axis, fallback) {
@@ -32,6 +64,7 @@ mode.addEventListener("change", () => {
   expression.value = examples[mode.value];
   ranges = defaultRanges(mode.value);
   autoYScale = mode.value === "curve";
+  updateIntervalInputs();
   image.hidden = true;
   placeholder.hidden = false;
   axisButtons.forEach((axisButton) => {
@@ -41,8 +74,21 @@ mode.addEventListener("change", () => {
 });
 
 expression.value = examples[mode.value];
+updateIntervalInputs();
 
 async function drawPlot() {
+  try {
+    ranges.x = readInterval("x");
+    if (mode.value !== "curve") {
+      ranges.y = readInterval("y");
+    }
+    if (mode.value === "implicit") {
+      ranges.z = readInterval("z");
+    }
+  } catch (error) {
+    status.textContent = error.message;
+    return;
+  }
   if (mode.value === "curve" && autoYScale) {
     ranges.y = null;
   }
@@ -62,6 +108,7 @@ async function drawPlot() {
         expression: expression.value,
         x_range: ranges.x,
         y_range: ranges.y,
+        z_range: ranges.z,
       }),
     });
     if (!response.ok) {
@@ -70,6 +117,8 @@ async function drawPlot() {
     }
     ranges.x = rangeFromHeader(response, "x", ranges.x);
     ranges.y = rangeFromHeader(response, "y", ranges.y);
+    ranges.z = rangeFromHeader(response, "z", ranges.z);
+    updateIntervalInputs();
     const plotUrl = URL.createObjectURL(await response.blob());
     const previousUrl = image.dataset.url;
     image.src = plotUrl;
@@ -102,6 +151,9 @@ axisButtons.forEach((axisButton) => {
     const center = (bounds[0] + bounds[1]) / 2;
     const halfSpan = ((bounds[1] - bounds[0]) * scale) / 2;
     ranges[axis] = [center - halfSpan, center + halfSpan];
+    if (mode.value !== "curve" || axis === "x") {
+      updateIntervalInputs();
+    }
     if (axis === "y") {
       autoYScale = false;
     }

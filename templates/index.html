@@ -28,6 +28,28 @@
             spellcheck="false" aria-describedby="formula-help"></textarea>
           <p id="formula-help" class="help">例如：\sin(x) 或 \frac{x^2-y^2}{5}</p>
 
+          <fieldset class="interval-controls">
+            <legend>变量区间</legend>
+            <div class="variable-interval" data-variable="x">
+              <label for="x-min">x</label>
+              <input id="x-min" type="number" step="any" aria-label="x 区间下限">
+              <span>到</span>
+              <input id="x-max" type="number" step="any" aria-label="x 区间上限">
+            </div>
+            <div class="variable-interval" data-variable="y" hidden>
+              <label for="y-min">y</label>
+              <input id="y-min" type="number" step="any" aria-label="y 区间下限">
+              <span>到</span>
+              <input id="y-max" type="number" step="any" aria-label="y 区间上限">
+            </div>
+            <div class="variable-interval" data-variable="z" hidden>
+              <label for="z-min">z</label>
+              <input id="z-min" type="number" step="any" aria-label="z 区间下限">
+              <span>到</span>
+              <input id="z-max" type="number" step="any" aria-label="z 区间上限">
+            </div>
+          </fieldset>
+
           <button id="submit-button" type="submit">绘制函数</button>
           <p id="status" class="status" role="status" aria-live="polite"></p>
         </form>

@@ -126,7 +126,7 @@ def parse_axis_range(data, axis, default):
     return bounds
 
 
-def render_plot(expression, mode, x_range=None, y_range=None):
+def render_plot(expression, mode, x_range=None, y_range=None, z_range=None):
     figure = plt.figure(figsize=(8, 6), dpi=120)
     try:
         if mode == "curve":
@@ -156,7 +156,7 @@ def render_plot(expression, mode, x_range=None, y_range=None):
         else:
             x_range = x_range or (-5, 5)
             y_range = y_range or (-5, 5)
-            z_range = (-5, 5)
+            z_range = z_range or (-5, 5)
             axis = figure.add_subplot(111, projection="3d")
             x = np.linspace(*x_range, 48)
             y = np.linspace(*y_range, 48)
@@ -189,6 +189,8 @@ def render_plot(expression, mode, x_range=None, y_range=None):
                 title="3D Implicit Surface",
             )
         visible_ranges = {"x": axis.get_xlim(), "y": axis.get_ylim()}
+        if mode == "implicit":
+            visible_ranges["z"] = axis.get_zlim()
         figure.tight_layout()
         image = io.BytesIO()
         figure.savefig(image, format="png", bbox_inches="tight")
@@ -213,7 +215,14 @@ def plot():
         default_y_range = None if mode == "curve" else (-5, 5)
         x_range = parse_axis_range(data, "x", default_x_range)
         y_range = parse_axis_range(data, "y", default_y_range)
-        image, visible_ranges = render_plot(expression, mode, x_range, y_range)
+        z_range = (
+            parse_axis_range(data, "z", (-5, 5))
+            if mode == "implicit"
+            else (-5, 5)
+        )
+        image, visible_ranges = render_plot(
+            expression, mode, x_range, y_range, z_range
+        )
     except InvalidExpression as error:
         return jsonify(error=str(error)), 400
     except (TypeError, ValueError, OverflowError) as error:

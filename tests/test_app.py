@@ -94,6 +94,19 @@ def test_surface_and_implicit_plots_return_png():
         assert response.headers["X-Plot-Y-Range"] == "-2,4"
 
 
+def test_implicit_plot_uses_selected_z_interval():
+    response = app.test_client().post(
+        "/plot",
+        json={
+            "mode": "implicit",
+            "expression": "x^2+y^2+z^2=9",
+            "z_range": [-2, 4],
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["X-Plot-Z-Range"] == "-2,4"
+
+
 def test_expression_rejects_variables_outside_selected_mode():
     with pytest.raises(ValueError, match="只支持变量 x"):
         parse_expression("x+y", "curve")
