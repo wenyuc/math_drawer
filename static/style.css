@@ -71,9 +71,9 @@ label {
 }
 
 select,
-textarea {
+textarea,
+.variable-interval input {
   width: 100%;
-  margin-bottom: 22px;
   border: 1px solid #d5deea;
   border-radius: 9px;
   background: #fff;
@@ -81,9 +81,20 @@ textarea {
   font: inherit;
 }
 
+select,
+textarea {
+  margin-bottom: 22px;
+}
+
 select {
   min-height: 44px;
   padding: 0 12px;
+}
+
+.variable-interval input {
+  min-width: 0;
+  min-height: 38px;
+  padding: 0 8px;
 }
 
 textarea {
@@ -95,9 +106,43 @@ textarea {
 }
 
 select:focus,
-textarea:focus {
+textarea:focus,
+.variable-interval input:focus {
   border-color: #3b82f6;
   outline: 3px solid rgb(59 130 246 / 15%);
+}
+
+.interval-controls {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 14px;
+  border: 1px solid #e1e8f0;
+  border-radius: 9px;
+}
+
+.interval-controls legend {
+  padding: 0 5px;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.variable-interval {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.variable-interval[hidden] {
+  display: none;
+}
+
+.variable-interval label {
+  margin: 0;
+  color: #172033;
 }
 
 .help {
