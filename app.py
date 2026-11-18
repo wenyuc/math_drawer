@@ -39,6 +39,7 @@ SAFE_FUNCTIONS = {
     sp.tan,
     sp.tanh,
 }
+CURVE_COLORS = ("#2563eb", "#dc2626", "#16a34a", "#9333ea")
 
 
 class InvalidExpression(ValueError):
@@ -126,15 +127,35 @@ def parse_axis_range(data, axis, default):
     return bounds
 
 
-def render_plot(expression, mode, x_range=None, y_range=None, z_range=None):
+def render_plot(
+    expression,
+    mode,
+    x_range=None,
+    y_range=None,
+    z_range=None,
+    curve_functions=None,
+):
     figure = plt.figure(figsize=(8, 6), dpi=120)
     try:
         if mode == "curve":
-            x_range = x_range or (-10, 10)
-            x = np.linspace(*x_range, 800)
-            y = evaluate(expression, VARIABLES[mode], x)
+            curves = curve_functions or [(expression, x_range or (-10, 10))]
+            x_range = x_range or (
+                min(function_range[0] for _, function_range in curves),
+                max(function_range[1] for _, function_range in curves),
+            )
             axis = figure.add_subplot(111)
-            axis.plot(x, y, color="#2563eb", linewidth=2)
+            for index, (function, function_range) in enumerate(curves):
+                x = np.linspace(*function_range, 800)
+                y = evaluate(function, VARIABLES[mode], x)
+                axis.plot(
+                    x,
+                    y,
+                    color=CURVE_COLORS[index],
+                    linewidth=2,
+                    label=str(function),
+                )
+            if len(curves) > 1:
+                axis.legend()
             axis.axhline(0, color="#64748b", linewidth=0.8)
             axis.axvline(0, color="#64748b", linewidth=0.8)
             axis.set_xlim(*x_range)
@@ -210,8 +231,36 @@ def plot():
     data = request.get_json(silent=True) or {}
     try:
         mode = data.get("mode", "")
-        expression = parse_expression(data.get("expression"), mode)
-        default_x_range = (-10, 10) if mode == "curve" else (-5, 5)
+        curve_functions = None
+        if mode == "curve" and "functions" in data:
+            function_data = data["functions"]
+            if (
+                not isinstance(function_data, list)
+                or not 1 <= len(function_data) <= 4
+            ):
+                raise InvalidExpression("请提供 1 到 4 个函数。")
+            curve_functions = []
+            for index, function in enumerate(function_data, start=1):
+                if not isinstance(function, dict):
+                    raise InvalidExpression(f"函数 {index} 格式无效。")
+                try:
+                    parsed = parse_expression(function.get("expression"), mode)
+                except InvalidExpression as error:
+                    raise InvalidExpression(
+                        f"函数 {index} 无法解析：{error}"
+                    ) from error
+                function_range = parse_axis_range(
+                    {"x_range": function.get("x_range")}, "x", (-10, 10)
+                )
+                curve_functions.append((parsed, function_range))
+            expression = curve_functions[0][0]
+            default_x_range = (
+                min(function_range[0] for _, function_range in curve_functions),
+                max(function_range[1] for _, function_range in curve_functions),
+            )
+        else:
+            expression = parse_expression(data.get("expression"), mode)
+            default_x_range = (-10, 10) if mode == "curve" else (-5, 5)
         default_y_range = None if mode == "curve" else (-5, 5)
         x_range = parse_axis_range(data, "x", default_x_range)
         y_range = parse_axis_range(data, "y", default_y_range)
@@ -221,7 +270,12 @@ def plot():
             else (-5, 5)
         )
         image, visible_ranges = render_plot(
-            expression, mode, x_range, y_range, z_range
+            expression,
+            mode,
+            x_range,
+            y_range,
+            z_range,
+            curve_functions=curve_functions,
         )
     except InvalidExpression as error:
         return jsonify(error=str(error)), 400
