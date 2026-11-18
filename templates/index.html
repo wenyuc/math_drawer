@@ -23,12 +23,18 @@
             <option value="implicit">三维隐式曲面：F(x, y, z) = 0</option>
           </select>
 
-          <label for="expression">LaTeX 数学公式</label>
-          <textarea id="expression" name="expression" rows="3" maxlength="200"
+          <label class="expression-control" for="expression">LaTeX 数学公式</label>
+          <textarea class="expression-control" id="expression" name="expression" rows="3" maxlength="200"
             spellcheck="false" aria-describedby="formula-help"></textarea>
-          <p id="formula-help" class="help">例如：\sin(x) 或 \frac{x^2-y^2}{5}</p>
+          <p id="formula-help" class="help expression-control">例如：\sin(x) 或 \frac{x^2-y^2}{5}</p>
 
-          <fieldset class="interval-controls">
+          <section id="curve-function-editor" hidden aria-label="二维函数列表">
+            <div id="curve-function-list"></div>
+            <button id="add-function-button" class="secondary-button" type="button">添加函数</button>
+            <p class="help">每个函数的 x 区间可单独设置；留空时使用默认区间 -10 到 10。</p>
+          </section>
+
+          <fieldset class="interval-controls" id="axis-interval-controls">
             <legend>变量区间</legend>
             <div class="variable-interval" data-variable="x">
               <label for="x-min">x</label>
@@ -73,7 +79,7 @@
           </div>
         </div>
       </section>
-      <footer>公式由本地 Python 服务计算与绘制，默认坐标范围为 -5 到 5（二维曲线为 -10 到 10）。</footer>
+      <footer>公式由本地 Python 服务计算与绘制，二维曲线最多支持 4 个函数；每个函数可单独设置 x 区间，留空时默认使用 -10 到 10。三维坐标默认范围为 -5 到 5。</footer>
     </main>
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
   </body>

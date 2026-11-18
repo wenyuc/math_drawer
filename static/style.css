@@ -72,7 +72,8 @@ label {
 
 select,
 textarea,
-.variable-interval input {
+.variable-interval input,
+.function-interval input {
   width: 100%;
   border: 1px solid #d5deea;
   border-radius: 9px;
@@ -97,6 +98,12 @@ select {
   padding: 0 8px;
 }
 
+.function-interval input {
+  min-width: 0;
+  min-height: 34px;
+  padding: 0 7px;
+}
+
 textarea {
   min-height: 92px;
   padding: 12px;
@@ -107,7 +114,8 @@ textarea {
 
 select:focus,
 textarea:focus,
-.variable-interval input:focus {
+.variable-interval input:focus,
+.function-interval input:focus {
   border-color: #3b82f6;
   outline: 3px solid rgb(59 130 246 / 15%);
 }
@@ -119,6 +127,10 @@ textarea:focus,
   padding: 14px;
   border: 1px solid #e1e8f0;
   border-radius: 9px;
+}
+
+.interval-controls[hidden] {
+  display: none;
 }
 
 .interval-controls legend {
@@ -138,6 +150,75 @@ textarea:focus,
 
 .variable-interval[hidden] {
   display: none;
+}
+
+#curve-function-editor[hidden],
+.expression-control[hidden] {
+  display: none;
+}
+
+.curve-function-row {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #e1e8f0;
+  border-left: 4px solid var(--function-color);
+  border-radius: 9px;
+}
+
+.curve-function-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--function-color);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.curve-function-row label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.curve-function-row textarea {
+  display: block;
+  min-height: 58px;
+  margin: 7px 0 0;
+  font-size: 13px;
+}
+
+.function-interval {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.secondary-button,
+.remove-function-button {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+}
+
+.secondary-button {
+  width: 100%;
+}
+
+.secondary-button:hover,
+.remove-function-button:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #172033;
+}
+
+.remove-function-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .variable-interval label {
