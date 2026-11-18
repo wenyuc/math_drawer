@@ -65,10 +65,13 @@ def parse_expression(latex, mode):
     except (LaTeXParsingError, ValueError, TypeError) as error:
         raise InvalidExpression("无法解析该 LaTeX 表达式，请检查公式格式。") from error
 
-    euler_symbols = {
-        symbol: sp.E for symbol in expression.free_symbols if symbol.name == "e"
+    constants = {"e": sp.E, "pi": sp.pi}
+    constant_symbols = {
+        symbol: constants[symbol.name]
+        for symbol in expression.free_symbols
+        if symbol.name in constants
     }
-    expression = expression.xreplace(euler_symbols)
+    expression = expression.xreplace(constant_symbols)
 
     logarithms = {}
     for logarithm in expression.atoms(sp.log):

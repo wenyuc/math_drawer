@@ -1,4 +1,5 @@
 import pytest
+import sympy as sp
 
 from matplotlib.axes import Axes
 
@@ -135,6 +136,13 @@ def test_euler_constant_curve_returns_png():
     assert response.status_code == 200
     assert response.mimetype == "image/png"
     assert response.data.startswith(b"\x89PNG")
+
+
+def test_pi_is_treated_as_a_math_constant():
+    expression = parse_expression(r"\sin(x+\frac{\pi}{3})", "curve")
+
+    assert expression == sp.sin(sp.Symbol("x") + sp.pi / 3)
+    assert expression.free_symbols == {sp.Symbol("x")}
 
 
 def test_surface_and_implicit_plots_return_png():
